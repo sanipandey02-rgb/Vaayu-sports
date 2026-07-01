@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Vaayu Sports – Premium Cricket Store</title>
+    
+    <!-- 🏏 SITE ICON (FAVICON) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%8F%3C/text%3E%3C/svg%3E" type="image/svg+xml" />
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -88,7 +92,7 @@
         .hero h1 span { color: #ffc107; }
         .hero p { font-size: 1.2rem; opacity: 0.9; margin: 15px 0; }
 
-        /* ----- CATEGORY GRID (Homepage Highlights) ----- */
+        /* ----- CATEGORY HIGHLIGHTS ----- */
         .category-highlights {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -118,7 +122,7 @@
         .section-title { font-size: 2rem; color: #0a2e5c; margin: 30px 0 10px; border-left: 6px solid #ffc107; padding-left: 16px; }
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
             gap: 30px;
             margin-top: 20px;
         }
@@ -141,6 +145,13 @@
             border-radius: 12px;
         }
         .product-card h3 { font-size: 1.1rem; color: #0a2e5c; margin: 12px 0 4px; }
+        .product-card .product-desc {
+            font-size: 0.85rem;
+            color: #555;
+            margin: 4px 0 8px;
+            line-height: 1.4;
+            min-height: 40px;
+        }
         .product-card .category-tag { font-size: 0.75rem; color: #6c757d; background: #e9ecef; padding: 2px 12px; border-radius: 30px; display: inline-block; }
         .product-card .price { font-size: 1.6rem; font-weight: 700; color: #e67e22; margin: 6px 0; }
         .product-card .btn-add-cart {
@@ -197,7 +208,7 @@
         }
         .btn-checkout:hover { background: #218838; }
 
-        /* ----- CHECKOUT FORM (Popup) ----- */
+        /* ----- CHECKOUT MODAL ----- */
         .checkout-modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -238,7 +249,7 @@
         }
         .checkout-form .btn-submit-order:hover { background: #e6b800; }
 
-        /* ----- ADMIN PANEL (Full width section) ----- */
+        /* ----- ADMIN PANEL ----- */
         #adminPanel {
             display: none;
             background: white;
@@ -258,7 +269,6 @@
         .admin-product-item .info img { width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 6px; }
         .btn-delete { background: #dc3545; color: white; border: none; padding: 6px 16px; border-radius: 30px; cursor: pointer; font-weight: 600; }
 
-        /* ----- ABOUT / FOOTER ----- */
         .about-section { background: white; padding: 50px 30px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); margin: 30px 0; }
         .about-section h2 { color: #0a2e5c; border-left: 6px solid #ffc107; padding-left: 16px; }
         .footer { text-align: center; padding: 30px; color: #6c757d; border-top: 1px solid #eef2f7; margin-top: 30px; }
@@ -266,7 +276,7 @@
         .loader { text-align: center; padding: 40px; font-size: 1.2rem; color: #0a2e5c; }
         .no-products { text-align: center; padding: 60px; color: #6c757d; }
 
-        /* ----- LOGIN MODAL ----- */
+        /* LOGIN MODAL */
         .login-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 4000;
@@ -313,7 +323,7 @@
     <p style="font-size:0.9rem; opacity:0.7;">Bats • Balls • Gloves • Pads • Helmets • Accessories</p>
 </section>
 
-<!-- ==================== CATEGORY HIGHLIGHTS (Homepage) ==================== -->
+<!-- ==================== CATEGORY HIGHLIGHTS ==================== -->
 <div class="category-highlights" id="categoryHighlights">
     <div class="cat-card" onclick="filterProducts('Bat')"><i class="fas fa-baseball-bat-ball"></i><h4>Bats</h4></div>
     <div class="cat-card" onclick="filterProducts('Ball')"><i class="fas fa-circle"></i><h4>Balls</h4></div>
@@ -323,21 +333,20 @@
     <div class="cat-card" onclick="filterProducts('Accessories')"><i class="fas fa-socks"></i><h4>Accessories</h4></div>
 </div>
 
-<!-- ==================== PRODUCTS SECTION ==================== -->
+<!-- ==================== PRODUCTS ==================== -->
 <div class="container">
     <h2 class="section-title" id="categoryTitle">🔥 All Products</h2>
     <div id="shopLoading" class="loader"><i class="fas fa-spinner fa-spin"></i> Loading Gears...</div>
     <div id="productsContainer" class="products-grid"></div>
 </div>
 
-<!-- ==================== ABOUT SECTION ==================== -->
+<!-- ==================== ABOUT ==================== -->
 <div class="container">
     <div class="about-section">
         <h2>📍 About Vaayu Sports</h2>
         <p style="font-size:1.05rem; color:#444; margin-top:16px;">
             <strong>Vaayu Sports</strong> is a premier sports equipment store based in India, specializing in high-quality 
             <strong>cricket gear</strong> – from professional-grade bats and leather balls to premium protective gear. 
-            We are committed to delivering the best equipment for aspiring cricketers and sports enthusiasts. 
             <br><br>
             <i class="fas fa-store" style="color:#ffc107;"></i> <strong>Visit our store:</strong> Near City Center, Lucknow, U.P. 
             <br>
@@ -354,20 +363,20 @@
     </div>
     <h3>➕ Add New Product</h3>
     <div class="form-row">
-        <input type="text" id="prodName" placeholder="Product Name (e.g. SG Scorpio Bat)" />
+        <input type="text" id="prodName" placeholder="Product Name" />
         <input type="text" id="prodPrice" placeholder="Price (e.g. 4500)" />
         <input type="text" id="prodImage" placeholder="Image URL" />
-        <input type="text" id="prodCategory" placeholder="Category (Bat, Ball, Gloves...)" />
+        <input type="text" id="prodCategory" placeholder="Category (Bat, Ball...)" />
+        <input type="text" id="prodDesc" placeholder="Short Description" />
     </div>
     <button class="btn-add" onclick="addProduct()"><i class="fas fa-plus-circle"></i> Add Product</button>
-
     <hr style="margin:30px 0;" />
     <h3>📦 Manage Existing Products</h3>
     <div id="adminProductList"></div>
     <div id="adminLoading" class="loader" style="display:none;">Loading...</div>
 </div>
 
-<!-- ==================== CART SIDEBAR ==================== -->
+<!-- ==================== CART ==================== -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCartOutside(event)">
     <div class="cart-sidebar">
         <span class="close-cart" onclick="toggleCart()">&times;</span>
@@ -378,27 +387,25 @@
     </div>
 </div>
 
-<!-- ==================== CHECKOUT MODAL ==================== -->
+<!-- ==================== CHECKOUT ==================== -->
 <div class="checkout-modal" id="checkoutModal">
     <div class="checkout-form">
         <span style="float:right; font-size:1.8rem; cursor:pointer; color:#dc3545;" onclick="closeCheckout()">&times;</span>
         <h2>📋 Confirm Order</h2>
-        <p style="color:#6c757d;">Enter your details to place the order.</p>
         <input type="text" id="custName" placeholder="Full Name" />
         <input type="text" id="custPhone" placeholder="Phone Number" />
         <textarea id="custAddress" rows="3" placeholder="Delivery Address"></textarea>
-        <input type="text" id="custNotes" placeholder="Additional Notes (optional)" />
+        <input type="text" id="custNotes" placeholder="Additional Notes" />
         <button class="btn-submit-order" onclick="placeOrder()"><i class="fas fa-check-circle"></i> Confirm Order</button>
         <div id="orderStatus" style="margin-top:12px; color:#28a745; font-weight:600;"></div>
     </div>
 </div>
 
-<!-- ==================== LOGIN MODAL ==================== -->
+<!-- ==================== LOGIN ==================== -->
 <div class="login-modal" id="loginModal">
     <div class="login-box">
         <span style="float:right; font-size:1.8rem; cursor:pointer; color:#dc3545;" onclick="closeLoginModal()">&times;</span>
         <h2>🔐 Admin Login</h2>
-        <p style="color:#6c757d;">Vaayu Sports Management</p>
         <input type="email" id="loginEmail" placeholder="Email" />
         <input type="password" id="loginPassword" placeholder="Password" />
         <button onclick="loginAdmin()">Login</button>
@@ -409,15 +416,14 @@
 <!-- ==================== FOOTER ==================== -->
 <div class="footer">
     &copy; 2026 Vaayu Sports | Made with <i class="fas fa-heart" style="color:#dc3545;"></i> for Champions
-    <br>
-    <i class="fas fa-envelope"></i> info@vaayusports.in | <i class="fas fa-instagram"></i> @vaayu_sports
+    <br><i class="fas fa-envelope"></i> info@vaayusports.in | <i class="fas fa-instagram"></i> @vaayu_sports
 </div>
 
 <!-- ======================================================== -->
-<!-- ==================== JAVASCRIPT (FIREBASE LOGIC) ==================== -->
+<!-- ==================== JAVASCRIPT ==================== -->
 <script>
     // ============================================================
-    // 🔥 STEP 1: अपनी Firebase Config यहाँ पेस्ट करें
+    // 🔥 अपनी Firebase Config यहाँ पेस्ट करें
     // ============================================================
     const firebaseConfig = {
         apiKey: "YOUR_FIREBASE_API_KEY",
@@ -428,12 +434,11 @@
         appId: "YOUR_FIREBASE_APP_ID"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    // ---------- GLOBAL VARIABLES ----------
+    // ---------- GLOBALS ----------
     let currentUser = null;
     let cart = [];
     let currentFilter = 'All';
@@ -448,7 +453,7 @@
     const cartCountSpan = document.getElementById('cartCount');
     const adminProductList = document.getElementById('adminProductList');
 
-    // ---------- AUTH: LOGIN / LOGOUT ----------
+    // ---------- AUTH ----------
     window.showLoginModal = function() {
         document.getElementById('loginModal').style.display = 'flex';
         document.getElementById('loginError').innerText = '';
@@ -483,10 +488,9 @@
         else { currentUser = null; document.getElementById('adminPanel').style.display = 'none'; }
     });
 
-    // ---------- FILTER PRODUCTS ----------
+    // ---------- FILTER ----------
     window.filterProducts = function(category) {
         currentFilter = category;
-        // Update active button style
         document.querySelectorAll('.nav-links button').forEach(btn => btn.classList.remove('active-cat'));
         document.querySelectorAll('.nav-links button').forEach(btn => {
             if (btn.innerText.trim().includes(category) || (category === 'All' && btn.innerText.includes('All'))) {
@@ -495,16 +499,15 @@
         });
         categoryTitle.innerText = category === 'All' ? '🔥 All Products' : `🏏 ${category}s`;
         renderProducts(allProducts);
-        // Scroll to products
         document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
     };
 
-    // ---------- RENDER PRODUCTS (Public) ----------
+    // ---------- RENDER ----------
     function renderProducts(products) {
         const filtered = currentFilter === 'All' ? products : products.filter(p => p.category === currentFilter);
         productsContainer.innerHTML = '';
         if (filtered.length === 0) {
-            productsContainer.innerHTML = '<div class="no-products">🛒 No products in this category. Check back soon!</div>';
+            productsContainer.innerHTML = '<div class="no-products">🛒 No products in this category.</div>';
             return;
         }
         filtered.forEach(p => {
@@ -513,6 +516,7 @@
             card.innerHTML = `
                 <img src="${p.image || 'https://via.placeholder.com/200'}" alt="${p.name}" />
                 <h3>${p.name}</h3>
+                <p class="product-desc">${p.description || 'Premium cricket gear from Vaayu Sports.'}</p>
                 <span class="category-tag">${p.category}</span>
                 <div class="price">₹${p.price}</div>
                 <button class="btn-add-cart" onclick="addToCart('${p.id}')"><i class="fas fa-cart-plus"></i> Add to Cart</button>
@@ -521,7 +525,7 @@
         });
     }
 
-    // ---------- LOAD PRODUCTS FROM FIREBASE ----------
+    // ---------- LOAD ----------
     function loadPublicProducts() {
         shopLoading.style.display = 'block';
         db.collection('vaayu_products').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
@@ -535,7 +539,7 @@
         });
     }
 
-    // ---------- ADMIN: LOAD PRODUCTS ----------
+    // ---------- ADMIN LOAD ----------
     function loadAdminProducts() {
         if (!currentUser) return;
         const loading = document.getElementById('adminLoading');
@@ -559,17 +563,18 @@
         });
     }
 
-    // ---------- ADMIN: ADD PRODUCT ----------
+    // ---------- ADMIN ADD ----------
     window.addProduct = function() {
         if (!currentUser) { alert('Please login as Admin.'); return; }
         const name = document.getElementById('prodName').value.trim();
         const price = document.getElementById('prodPrice').value.trim();
         const image = document.getElementById('prodImage').value.trim();
         const category = document.getElementById('prodCategory').value.trim();
+        const description = document.getElementById('prodDesc').value.trim() || 'Premium product from Vaayu Sports.';
         if (!name || !price || !image || !category) { alert('All fields required!'); return; }
         if (isNaN(price)) { alert('Price must be a number.'); return; }
         db.collection('vaayu_products').add({
-            name, price: parseFloat(price), image, category,
+            name, price: parseFloat(price), image, category, description,
             stock: 'In Stock',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
@@ -578,10 +583,11 @@
             document.getElementById('prodPrice').value = '';
             document.getElementById('prodImage').value = '';
             document.getElementById('prodCategory').value = '';
+            document.getElementById('prodDesc').value = '';
         }).catch(err => alert('Error: ' + err.message));
     };
 
-    // ---------- ADMIN: DELETE PRODUCT ----------
+    // ---------- ADMIN DELETE ----------
     window.deleteProduct = function(id) {
         if (!currentUser) return;
         if (!confirm('Delete this product?')) return;
@@ -590,7 +596,7 @@
             .catch(err => alert('Error: ' + err.message));
     };
 
-    // ---------- CART LOGIC ----------
+    // ---------- CART ----------
     window.addToCart = function(productId) {
         const product = allProducts.find(p => p.id === productId);
         if (!product) return;
@@ -598,7 +604,7 @@
         if (existing) { existing.qty += 1; }
         else { cart.push({ ...product, qty: 1 }); }
         updateCartUI();
-        toggleCart(); // Open cart
+        toggleCart();
     };
     function updateCartUI() {
         cartItemsDiv.innerHTML = '';
@@ -637,7 +643,7 @@
         if (e.target === e.currentTarget) toggleCart();
     };
 
-    // ---------- CHECKOUT / PLACE ORDER ----------
+    // ---------- CHECKOUT ----------
     window.showCheckout = function() {
         if (cart.length === 0) { alert('Cart is empty!'); return; }
         document.getElementById('checkoutModal').style.display = 'flex';
@@ -666,12 +672,10 @@
         }).catch(err => alert('Order failed: ' + err.message));
     };
 
-    // ---------- INIT LOAD ----------
+    // ---------- INIT ----------
     loadPublicProducts();
-    // Load admin if already logged in
     if (auth.currentUser) { loadAdminProducts(); }
-
-    console.log('🏏 Vaayu Sports Full E-Commerce Loaded!');
+    console.log('🏏 Vaayu Sports Loaded!');
 </script>
 </body>
 </html>

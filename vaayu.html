@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vaayu Sports – Premium Cricket Store</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <!-- Font Awesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #f8f9fa; }
+
+        /* ----- NAVBAR ----- */
+        .navbar {
+            background: #0a2e5c;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            min-height: 70px;
+        }
+        .navbar .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+        }
+        .navbar .logo span { color: #ffc107; }
+        .navbar .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .navbar .nav-links button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            background: transparent;
+            color: #ccd6f6;
+            font-size: 0.9rem;
+        }
+        .navbar .nav-links button:hover { background: #ffc107; color: #0a2e5c; }
+        .navbar .nav-links .active-cat { background: #ffc107; color: #0a2e5c; }
+        .cart-btn {
+            background: #ffc107 !important;
+            color: #0a2e5c !important;
+            position: relative;
+            padding: 8px 20px !important;
+        }
+        .cart-btn .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .admin-toggle {
+            background: #28a745 !important;
+            color: white !important;
+        }
+        .admin-toggle:hover { background: #218838 !important; }
+
+        /* ----- HERO ----- */
+        .hero {
+            background: linear-gradient(135deg, #0a2e5c 0%, #1a4a7a 100%);
+            color: white;
+            padding: 60px 30px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 3.5rem; font-weight: 800; }
+        .hero h1 span { color: #ffc107; }
+        .hero p { font-size: 1.2rem; opacity: 0.9; margin: 15px 0; }
+
+        /* ----- CATEGORY GRID (Homepage Highlights) ----- */
+        .category-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: -30px auto 30px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+        .cat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            transition: 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .cat-card:hover { transform: translateY(-6px); border-color: #ffc107; }
+        .cat-card i { font-size: 2.5rem; color: #0a2e5c; }
+        .cat-card h4 { margin-top: 10px; color: #0a2e5c; }
+
+        /* ----- PRODUCT GRID ----- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .section-title { font-size: 2rem; color: #0a2e5c; margin: 30px 0 10px; border-left: 6px solid #ffc107; padding-left: 16px; }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            border: 1px solid #eef2f7;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        .product-card h3 { font-size: 1.1rem; color: #0a2e5c; margin: 12px 0 4px; }
+        .product-card .category-tag { font-size: 0.75rem; color: #6c757d; background: #e9ecef; padding: 2px 12px; border-radius: 30px; display: inline-block; }
+        .product-card .price { font-size: 1.6rem; font-weight: 700; color: #e67e22; margin: 6px 0; }
+        .product-card .btn-add-cart {
+            background: #0a2e5c;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .product-card .btn-add-cart:hover { background: #ffc107; color: #0a2e5c; }
+
+        /* ----- CART SIDEBAR ----- */
+        .cart-overlay {
+            position: fixed;
+            top: 0; right: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            justify-content: flex-end;
+        }
+        .cart-sidebar {
+            background: white;
+            width: 420px;
+            max-width: 90%;
+            height: 100%;
+            padding: 30px;
+            overflow-y: auto;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.2);
+        }
+        .cart-sidebar .close-cart { float: right; font-size: 1.8rem; cursor: pointer; color: #dc3545; }
+        .cart-sidebar h2 { color: #0a2e5c; border-bottom: 3px solid #ffc107; padding-bottom: 12px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+        .cart-item .item-info { flex: 1; }
+        .cart-item .item-info h4 { font-size: 1rem; }
+        .cart-item .qty-control { display: flex; gap: 10px; align-items: center; }
+        .cart-item .qty-control button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: 700; }
+        .cart-item .qty-control button:hover { background: #0a2e5c; color: white; }
+        .cart-total { font-size: 1.5rem; font-weight: 700; margin: 20px 0; color: #0a2e5c; }
+        .btn-checkout {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        .btn-checkout:hover { background: #218838; }
+
+        /* ----- CHECKOUT FORM (Popup) ----- */
+        .checkout-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 3000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .checkout-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .checkout-form h2 { color: #0a2e5c; margin-bottom: 20px; }
+        .checkout-form input, .checkout-form textarea {
+            width: 100%;
+            padding: 14px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+        }
+        .checkout-form .btn-submit-order {
+            background: #ffc107;
+            color: #0a2e5c;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .checkout-form .btn-submit-order:hover { background: #e6b800; }
+
+        /* ----- ADMIN PANEL (Full width section) ----- */
+        #adminPanel {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            margin: 30px 0;
+            border: 2px solid #ffc107;
+        }
+        .admin-title { color: #0a2e5c; border-bottom: 3px solid #ffc107; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 16px 0; }
+        .form-row input { padding: 12px 16px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; }
+        .btn-add { background: #0a2e5c; color: white; padding: 14px 30px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; }
+        .btn-add:hover { background: #1a4a7a; }
+        .admin-product-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 12px 18px; border-radius: 10px; margin-bottom: 8px; border-left: 4px solid #ffc107; flex-wrap: wrap; gap: 10px; }
+        .admin-product-item .info { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .admin-product-item .info img { width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 6px; }
+        .btn-delete { background: #dc3545; color: white; border: none; padding: 6px 16px; border-radius: 30px; cursor: pointer; font-weight: 600; }
+
+        /* ----- ABOUT / FOOTER ----- */
+        .about-section { background: white; padding: 50px 30px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); margin: 30px 0; }
+        .about-section h2 { color: #0a2e5c; border-left: 6px solid #ffc107; padding-left: 16px; }
+        .footer { text-align: center; padding: 30px; color: #6c757d; border-top: 1px solid #eef2f7; margin-top: 30px; }
+
+        .loader { text-align: center; padding: 40px; font-size: 1.2rem; color: #0a2e5c; }
+        .no-products { text-align: center; padding: 60px; color: #6c757d; }
+
+        /* ----- LOGIN MODAL ----- */
+        .login-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 4000;
+            display: none; justify-content: center; align-items: center;
+        }
+        .login-box { background: white; padding: 40px; border-radius: 20px; max-width: 400px; width: 90%; }
+        .login-box h2 { color: #0a2e5c; }
+        .login-box input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; }
+        .login-box button { width: 100%; padding: 14px; background: #0a2e5c; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .login-box .error { color: #dc3545; margin-top: 10px; }
+
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 10px; padding: 10px; }
+            .navbar .nav-links { justify-content: center; }
+            .hero h1 { font-size: 2.2rem; }
+            .cart-sidebar { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== NAVBAR ==================== -->
+<nav class="navbar">
+    <div class="logo">Vaayu <span>Sports</span></div>
+    <div class="nav-links" id="navLinks">
+        <button class="active-cat" onclick="filterProducts('All')">🏏 All</button>
+        <button onclick="filterProducts('Bat')">🏏 Bats</button>
+        <button onclick="filterProducts('Ball')">⚾ Balls</button>
+        <button onclick="filterProducts('Gloves')">🧤 Gloves</button>
+        <button onclick="filterProducts('Pads')">🛡️ Pads</button>
+        <button onclick="filterProducts('Helmet')">⛑️ Helmets</button>
+        <button onclick="filterProducts('Accessories')">🎒 Accessories</button>
+        <button class="cart-btn" onclick="toggleCart()">
+            <i class="fas fa-shopping-cart"></i> Cart <span class="badge" id="cartCount">0</span>
+        </button>
+        <button class="admin-toggle" onclick="showLoginModal()"><i class="fas fa-user-shield"></i> Admin</button>
+    </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+    <h1>Vaayu <span>Sports</span></h1>
+    <p>🏆 Premium Cricket & Sports Equipment – Play Like a Champion!</p>
+    <p style="font-size:0.9rem; opacity:0.7;">Bats • Balls • Gloves • Pads • Helmets • Accessories</p>
+</section>
+
+<!-- ==================== CATEGORY HIGHLIGHTS (Homepage) ==================== -->
+<div class="category-highlights" id="categoryHighlights">
+    <div class="cat-card" onclick="filterProducts('Bat')"><i class="fas fa-baseball-bat-ball"></i><h4>Bats</h4></div>
+    <div class="cat-card" onclick="filterProducts('Ball')"><i class="fas fa-circle"></i><h4>Balls</h4></div>
+    <div class="cat-card" onclick="filterProducts('Gloves')"><i class="fas fa-hand-sparkles"></i><h4>Gloves</h4></div>
+    <div class="cat-card" onclick="filterProducts('Pads')"><i class="fas fa-shield"></i><h4>Pads</h4></div>
+    <div class="cat-card" onclick="filterProducts('Helmet')"><i class="fas fa-hard-hat"></i><h4>Helmets</h4></div>
+    <div class="cat-card" onclick="filterProducts('Accessories')"><i class="fas fa-socks"></i><h4>Accessories</h4></div>
+</div>
+
+<!-- ==================== PRODUCTS SECTION ==================== -->
+<div class="container">
+    <h2 class="section-title" id="categoryTitle">🔥 All Products</h2>
+    <div id="shopLoading" class="loader"><i class="fas fa-spinner fa-spin"></i> Loading Gears...</div>
+    <div id="productsContainer" class="products-grid"></div>
+</div>
+
+<!-- ==================== ABOUT SECTION ==================== -->
+<div class="container">
+    <div class="about-section">
+        <h2>📍 About Vaayu Sports</h2>
+        <p style="font-size:1.05rem; color:#444; margin-top:16px;">
+            <strong>Vaayu Sports</strong> is a premier sports equipment store based in India, specializing in high-quality 
+            <strong>cricket gear</strong> – from professional-grade bats and leather balls to premium protective gear. 
+            We are committed to delivering the best equipment for aspiring cricketers and sports enthusiasts. 
+            <br><br>
+            <i class="fas fa-store" style="color:#ffc107;"></i> <strong>Visit our store:</strong> Near City Center, Lucknow, U.P. 
+            <br>
+            <i class="fas fa-phone" style="color:#ffc107;"></i> <strong>Call us:</strong> +91 99999 88888
+        </p>
+    </div>
+</div>
+
+<!-- ==================== ADMIN PANEL ==================== -->
+<div id="adminPanel" class="container">
+    <div class="admin-title">
+        <span><i class="fas fa-tools"></i> Admin Dashboard – Manage Products</span>
+        <button class="btn-delete" onclick="logoutAdmin()" style="background:#dc3545; padding:6px 20px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+    <h3>➕ Add New Product</h3>
+    <div class="form-row">
+        <input type="text" id="prodName" placeholder="Product Name (e.g. SG Scorpio Bat)" />
+        <input type="text" id="prodPrice" placeholder="Price (e.g. 4500)" />
+        <input type="text" id="prodImage" placeholder="Image URL" />
+        <input type="text" id="prodCategory" placeholder="Category (Bat, Ball, Gloves...)" />
+    </div>
+    <button class="btn-add" onclick="addProduct()"><i class="fas fa-plus-circle"></i> Add Product</button>
+
+    <hr style="margin:30px 0;" />
+    <h3>📦 Manage Existing Products</h3>
+    <div id="adminProductList"></div>
+    <div id="adminLoading" class="loader" style="display:none;">Loading...</div>
+</div>
+
+<!-- ==================== CART SIDEBAR ==================== -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCartOutside(event)">
+    <div class="cart-sidebar">
+        <span class="close-cart" onclick="toggleCart()">&times;</span>
+        <h2><i class="fas fa-shopping-bag"></i> Your Cart</h2>
+        <div id="cartItems"></div>
+        <div class="cart-total" id="cartTotal">Total: ₹0</div>
+        <button class="btn-checkout" onclick="showCheckout()"><i class="fas fa-credit-card"></i> Place Order</button>
+    </div>
+</div>
+
+<!-- ==================== CHECKOUT MODAL ==================== -->
+<div class="checkout-modal" id="checkoutModal">
+    <div class="checkout-form">
+        <span style="float:right; font-size:1.8rem; cursor:pointer; color:#dc3545;" onclick="closeCheckout()">&times;</span>
+        <h2>📋 Confirm Order</h2>
+        <p style="color:#6c757d;">Enter your details to place the order.</p>
+        <input type="text" id="custName" placeholder="Full Name" />
+        <input type="text" id="custPhone" placeholder="Phone Number" />
+        <textarea id="custAddress" rows="3" placeholder="Delivery Address"></textarea>
+        <input type="text" id="custNotes" placeholder="Additional Notes (optional)" />
+        <button class="btn-submit-order" onclick="placeOrder()"><i class="fas fa-check-circle"></i> Confirm Order</button>
+        <div id="orderStatus" style="margin-top:12px; color:#28a745; font-weight:600;"></div>
+    </div>
+</div>
+
+<!-- ==================== LOGIN MODAL ==================== -->
+<div class="login-modal" id="loginModal">
+    <div class="login-box">
+        <span style="float:right; font-size:1.8rem; cursor:pointer; color:#dc3545;" onclick="closeLoginModal()">&times;</span>
+        <h2>🔐 Admin Login</h2>
+        <p style="color:#6c757d;">Vaayu Sports Management</p>
+        <input type="email" id="loginEmail" placeholder="Email" />
+        <input type="password" id="loginPassword" placeholder="Password" />
+        <button onclick="loginAdmin()">Login</button>
+        <div id="loginError" class="error"></div>
+    </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="footer">
+    &copy; 2026 Vaayu Sports | Made with <i class="fas fa-heart" style="color:#dc3545;"></i> for Champions
+    <br>
+    <i class="fas fa-envelope"></i> info@vaayusports.in | <i class="fas fa-instagram"></i> @vaayu_sports
+</div>
+
+<!-- ======================================================== -->
+<!-- ==================== JAVASCRIPT (FIREBASE LOGIC) ==================== -->
+<script>
+    // ============================================================
+    // 🔥 STEP 1: अपनी Firebase Config यहाँ पेस्ट करें
+    // ============================================================
+    const firebaseConfig = {
+        apiKey: "YOUR_FIREBASE_API_KEY",
+        authDomain: "YOUR_FIREBASE_AUTH_DOMAIN",
+        projectId: "YOUR_FIREBASE_PROJECT_ID",
+        storageBucket: "YOUR_FIREBASE_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_FIREBASE_SENDER_ID",
+        appId: "YOUR_FIREBASE_APP_ID"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    // ---------- GLOBAL VARIABLES ----------
+    let currentUser = null;
+    let cart = [];
+    let currentFilter = 'All';
+    let allProducts = [];
+
+    // ---------- DOM REFS ----------
+    const productsContainer = document.getElementById('productsContainer');
+    const shopLoading = document.getElementById('shopLoading');
+    const categoryTitle = document.getElementById('categoryTitle');
+    const cartItemsDiv = document.getElementById('cartItems');
+    const cartTotalDiv = document.getElementById('cartTotal');
+    const cartCountSpan = document.getElementById('cartCount');
+    const adminProductList = document.getElementById('adminProductList');
+
+    // ---------- AUTH: LOGIN / LOGOUT ----------
+    window.showLoginModal = function() {
+        document.getElementById('loginModal').style.display = 'flex';
+        document.getElementById('loginError').innerText = '';
+    };
+    window.closeLoginModal = function() {
+        document.getElementById('loginModal').style.display = 'none';
+    };
+    window.loginAdmin = function() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const errorDiv = document.getElementById('loginError');
+        if (!email || !password) { errorDiv.innerText = 'Enter email & password.'; return; }
+        auth.signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                currentUser = userCredential.user;
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadAdminProducts();
+                alert('✅ Admin Login Successful!');
+            })
+            .catch((error) => { errorDiv.innerText = '❌ ' + error.message; });
+    };
+    window.logoutAdmin = function() {
+        auth.signOut().then(() => {
+            currentUser = null;
+            document.getElementById('adminPanel').style.display = 'none';
+            alert('Logged out.');
+        });
+    };
+    auth.onAuthStateChanged((user) => {
+        if (user) { currentUser = user; document.getElementById('adminPanel').style.display = 'block'; loadAdminProducts(); }
+        else { currentUser = null; document.getElementById('adminPanel').style.display = 'none'; }
+    });
+
+    // ---------- FILTER PRODUCTS ----------
+    window.filterProducts = function(category) {
+        currentFilter = category;
+        // Update active button style
+        document.querySelectorAll('.nav-links button').forEach(btn => btn.classList.remove('active-cat'));
+        document.querySelectorAll('.nav-links button').forEach(btn => {
+            if (btn.innerText.trim().includes(category) || (category === 'All' && btn.innerText.includes('All'))) {
+                btn.classList.add('active-cat');
+            }
+        });
+        categoryTitle.innerText = category === 'All' ? '🔥 All Products' : `🏏 ${category}s`;
+        renderProducts(allProducts);
+        // Scroll to products
+        document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // ---------- RENDER PRODUCTS (Public) ----------
+    function renderProducts(products) {
+        const filtered = currentFilter === 'All' ? products : products.filter(p => p.category === currentFilter);
+        productsContainer.innerHTML = '';
+        if (filtered.length === 0) {
+            productsContainer.innerHTML = '<div class="no-products">🛒 No products in this category. Check back soon!</div>';
+            return;
+        }
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <img src="${p.image || 'https://via.placeholder.com/200'}" alt="${p.name}" />
+                <h3>${p.name}</h3>
+                <span class="category-tag">${p.category}</span>
+                <div class="price">₹${p.price}</div>
+                <button class="btn-add-cart" onclick="addToCart('${p.id}')"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+            `;
+            productsContainer.appendChild(card);
+        });
+    }
+
+    // ---------- LOAD PRODUCTS FROM FIREBASE ----------
+    function loadPublicProducts() {
+        shopLoading.style.display = 'block';
+        db.collection('vaayu_products').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+            shopLoading.style.display = 'none';
+            allProducts = [];
+            snapshot.forEach(doc => { allProducts.push({ id: doc.id, ...doc.data() }); });
+            renderProducts(allProducts);
+        }, (error) => {
+            shopLoading.style.display = 'none';
+            productsContainer.innerHTML = '<p style="color:red;">Error loading: ' + error.message + '</p>';
+        });
+    }
+
+    // ---------- ADMIN: LOAD PRODUCTS ----------
+    function loadAdminProducts() {
+        if (!currentUser) return;
+        const loading = document.getElementById('adminLoading');
+        loading.style.display = 'block';
+        db.collection('vaayu_products').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+            loading.style.display = 'none';
+            adminProductList.innerHTML = '';
+            if (snapshot.empty) { adminProductList.innerHTML = '<p style="color:#6c757d;">No products.</p>'; return; }
+            snapshot.forEach(doc => {
+                const d = doc.data();
+                adminProductList.innerHTML += `
+                    <div class="admin-product-item">
+                        <div class="info">
+                            <img src="${d.image || 'https://via.placeholder.com/40'}" />
+                            <div><strong>${d.name}</strong> (₹${d.price}) <span style="color:#6c757d;font-size:0.8rem;">${d.category}</span></div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteProduct('${doc.id}')"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                `;
+            });
+        });
+    }
+
+    // ---------- ADMIN: ADD PRODUCT ----------
+    window.addProduct = function() {
+        if (!currentUser) { alert('Please login as Admin.'); return; }
+        const name = document.getElementById('prodName').value.trim();
+        const price = document.getElementById('prodPrice').value.trim();
+        const image = document.getElementById('prodImage').value.trim();
+        const category = document.getElementById('prodCategory').value.trim();
+        if (!name || !price || !image || !category) { alert('All fields required!'); return; }
+        if (isNaN(price)) { alert('Price must be a number.'); return; }
+        db.collection('vaayu_products').add({
+            name, price: parseFloat(price), image, category,
+            stock: 'In Stock',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            alert('✅ Product Added!');
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodPrice').value = '';
+            document.getElementById('prodImage').value = '';
+            document.getElementById('prodCategory').value = '';
+        }).catch(err => alert('Error: ' + err.message));
+    };
+
+    // ---------- ADMIN: DELETE PRODUCT ----------
+    window.deleteProduct = function(id) {
+        if (!currentUser) return;
+        if (!confirm('Delete this product?')) return;
+        db.collection('vaayu_products').doc(id).delete()
+            .then(() => alert('Deleted.'))
+            .catch(err => alert('Error: ' + err.message));
+    };
+
+    // ---------- CART LOGIC ----------
+    window.addToCart = function(productId) {
+        const product = allProducts.find(p => p.id === productId);
+        if (!product) return;
+        const existing = cart.find(item => item.id === productId);
+        if (existing) { existing.qty += 1; }
+        else { cart.push({ ...product, qty: 1 }); }
+        updateCartUI();
+        toggleCart(); // Open cart
+    };
+    function updateCartUI() {
+        cartItemsDiv.innerHTML = '';
+        if (cart.length === 0) { cartItemsDiv.innerHTML = '<p style="color:#6c757d;">Cart is empty.</p>'; }
+        let total = 0;
+        cart.forEach(item => {
+            total += item.price * item.qty;
+            cartItemsDiv.innerHTML += `
+                <div class="cart-item">
+                    <div class="item-info"><h4>${item.name}</h4><small>₹${item.price}</small></div>
+                    <div class="qty-control">
+                        <button onclick="changeQty('${item.id}', -1)">-</button>
+                        <span>${item.qty}</span>
+                        <button onclick="changeQty('${item.id}', 1)">+</button>
+                    </div>
+                    <div>₹${item.price * item.qty}</div>
+                </div>
+            `;
+        });
+        cartTotalDiv.innerText = `Total: ₹${total}`;
+        const count = cart.reduce((acc, i) => acc + i.qty, 0);
+        cartCountSpan.innerText = count;
+    }
+    window.changeQty = function(id, delta) {
+        const item = cart.find(i => i.id === id);
+        if (!item) return;
+        item.qty += delta;
+        if (item.qty <= 0) { cart = cart.filter(i => i.id !== id); }
+        updateCartUI();
+    };
+    window.toggleCart = function() {
+        const overlay = document.getElementById('cartOverlay');
+        overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+    };
+    window.closeCartOutside = function(e) {
+        if (e.target === e.currentTarget) toggleCart();
+    };
+
+    // ---------- CHECKOUT / PLACE ORDER ----------
+    window.showCheckout = function() {
+        if (cart.length === 0) { alert('Cart is empty!'); return; }
+        document.getElementById('checkoutModal').style.display = 'flex';
+        document.getElementById('orderStatus').innerHTML = '';
+    };
+    window.closeCheckout = function() {
+        document.getElementById('checkoutModal').style.display = 'none';
+    };
+    window.placeOrder = function() {
+        const name = document.getElementById('custName').value.trim();
+        const phone = document.getElementById('custPhone').value.trim();
+        const address = document.getElementById('custAddress').value.trim();
+        if (!name || !phone || !address) { alert('Please fill Name, Phone, and Address.'); return; }
+        const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
+        db.collection('vaayu_orders').add({
+            customer: { name, phone, address, notes: document.getElementById('custNotes').value.trim() },
+            items: cart.map(i => ({ name: i.name, price: i.price, qty: i.qty, category: i.category })),
+            total: total,
+            status: 'Pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            document.getElementById('orderStatus').innerHTML = '✅ Order Placed Successfully! We will call you.';
+            cart = [];
+            updateCartUI();
+            setTimeout(() => { closeCheckout(); toggleCart(); }, 2000);
+        }).catch(err => alert('Order failed: ' + err.message));
+    };
+
+    // ---------- INIT LOAD ----------
+    loadPublicProducts();
+    // Load admin if already logged in
+    if (auth.currentUser) { loadAdminProducts(); }
+
+    console.log('🏏 Vaayu Sports Full E-Commerce Loaded!');
+</script>
+</body>
+</html>

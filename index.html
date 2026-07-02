@@ -425,15 +425,16 @@
     // ============================================================
     // 🔥 अपनी Firebase Config यहाँ पेस्ट करें
     // ============================================================
-    const firebaseConfig = {
-        apiKey: "YOUR_FIREBASE_API_KEY",
-        authDomain: "YOUR_FIREBASE_AUTH_DOMAIN",
-        projectId: "YOUR_FIREBASE_PROJECT_ID",
-        storageBucket: "YOUR_FIREBASE_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_FIREBASE_SENDER_ID",
-        appId: "YOUR_FIREBASE_APP_ID"
+     const firebaseConfig = {
+        apiKey: "AIzaSyDl1fiFglKLK4d5mRgNt-35umLBvph3nhk",
+        authDomain: "vaayu-sports.firebaseapp.com",
+        projectId: "vaayu-sports",
+        storageBucket: "vaayu-sports.firebasestorage.app",
+        messagingSenderId: "783300529761",
+        appId: "1:783300529761:web:0d2fa0af8b7d5778d2a420"
     };
 
+    // Initialize Firebase (Compat SDK तरीका - बिना "import" के)
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();

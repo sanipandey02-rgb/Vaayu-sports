@@ -12,6 +12,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    
+    <!-- EmailJS SDK (Order Notifications के लिए) -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
     <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
@@ -22,7 +26,7 @@
         /* ----- NAVBAR ----- */
         .navbar {
             background: #0a2e5c;
-            padding: 0 30px;
+            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -33,20 +37,19 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             min-height: 70px;
         }
-        .navbar .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: white;
-        }
+        .navbar .logo { font-size: 1.6rem; font-weight: 800; color: white; }
         .navbar .logo span { color: #ffc107; }
-        .navbar .nav-links {
+
+        /* ----- DESKTOP NAV LINKS ----- */
+        .nav-links {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
             align-items: center;
+            transition: all 0.3s ease;
         }
-        .navbar .nav-links button {
-            padding: 8px 16px;
+        .nav-links button {
+            padding: 8px 14px;
             border: none;
             border-radius: 30px;
             font-weight: 600;
@@ -54,17 +57,18 @@
             transition: 0.3s;
             background: transparent;
             color: #ccd6f6;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
         }
-        .navbar .nav-links button:hover { background: #ffc107; color: #0a2e5c; }
-        .navbar .nav-links .active-cat { background: #ffc107; color: #0a2e5c; }
-        .cart-btn {
+        .nav-links button:hover { background: #ffc107; color: #0a2e5c; }
+        .nav-links .active-cat { background: #ffc107; color: #0a2e5c; }
+        .nav-links .cart-btn {
             background: #ffc107 !important;
             color: #0a2e5c !important;
             position: relative;
-            padding: 8px 20px !important;
+            padding: 8px 18px !important;
         }
-        .cart-btn .badge {
+        .nav-links .cart-btn .badge {
             position: absolute;
             top: -6px;
             right: -6px;
@@ -72,227 +76,307 @@
             color: white;
             border-radius: 50%;
             padding: 2px 8px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
         }
-        .admin-toggle {
+        .nav-links .admin-toggle {
             background: #28a745 !important;
             color: white !important;
         }
-        .admin-toggle:hover { background: #218838 !important; }
+        .nav-links .admin-toggle:hover { background: #218838 !important; }
+
+        /* ----- HAMBURGER (Mobile) ----- */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px 4px;
+            background: transparent;
+            border: none;
+        }
+        .hamburger span {
+            width: 28px;
+            height: 3px;
+            background: white;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+        .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+
+        @media (max-width: 992px) {
+            .hamburger { display: flex; }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background: #0a2e5c;
+                padding: 20px 10px;
+                border-top: 1px solid #1a4a7a;
+                gap: 8px;
+                align-items: stretch;
+            }
+            .nav-links.open { display: flex; }
+            .nav-links button {
+                width: 100%;
+                text-align: center;
+                padding: 12px 16px;
+                font-size: 1rem;
+                background: rgba(255,255,255,0.05);
+                border-radius: 8px;
+            }
+            .nav-links button:hover { background: #ffc107; color: #0a2e5c; }
+        }
 
         /* ----- HERO ----- */
         .hero {
             background: linear-gradient(135deg, #0a2e5c 0%, #1a4a7a 100%);
             color: white;
-            padding: 60px 30px;
+            padding: 50px 20px;
             text-align: center;
         }
-        .hero h1 { font-size: 3.5rem; font-weight: 800; }
+        .hero h1 { font-size: 3rem; font-weight: 800; }
         .hero h1 span { color: #ffc107; }
-        .hero p { font-size: 1.2rem; opacity: 0.9; margin: 15px 0; }
+        .hero p { font-size: 1.1rem; opacity: 0.9; margin: 10px 0; }
 
         /* ----- CATEGORY HIGHLIGHTS ----- */
         .category-highlights {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
             max-width: 1200px;
             margin: -30px auto 30px;
-            padding: 0 20px;
+            padding: 0 16px;
             position: relative;
             z-index: 10;
         }
         .cat-card {
             background: white;
-            padding: 20px;
-            border-radius: 16px;
+            padding: 16px;
+            border-radius: 14px;
             text-align: center;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
             transition: 0.3s;
             cursor: pointer;
             border: 2px solid transparent;
         }
-        .cat-card:hover { transform: translateY(-6px); border-color: #ffc107; }
-        .cat-card i { font-size: 2.5rem; color: #0a2e5c; }
-        .cat-card h4 { margin-top: 10px; color: #0a2e5c; }
+        .cat-card:hover { transform: translateY(-4px); border-color: #ffc107; }
+        .cat-card i { font-size: 2rem; color: #0a2e5c; }
+        .cat-card h4 { margin-top: 6px; font-size: 0.95rem; color: #0a2e5c; }
 
-        /* ----- PRODUCT GRID ----- */
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .section-title { font-size: 2rem; color: #0a2e5c; margin: 30px 0 10px; border-left: 6px solid #ffc107; padding-left: 16px; }
+        /* ----- SHOP DETAILS (Homepage - Payment section removed) ----- */
+        .shop-details {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 25px;
+            margin: 20px 16px 30px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.06);
+            border: 1px solid #eef2f7;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .shop-details h2 {
+            color: #0a2e5c;
+            font-size: 1.5rem;
+            border-left: 5px solid #ffc107;
+            padding-left: 14px;
+            margin-bottom: 16px;
+        }
+        .shop-details .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 30px;
+        }
+        .shop-details .info-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            color: #333;
+            font-size: 0.98rem;
+            padding: 6px 0;
+        }
+        .shop-details .info-item i {
+            color: #ffc107;
+            font-size: 1.2rem;
+            min-width: 24px;
+        }
+        .shop-details .info-item strong { color: #0a2e5c; }
+        @media (max-width: 768px) {
+            .shop-details .info-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2.2rem; }
+        }
+
+        /* ----- PRODUCTS ----- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+        .section-title { font-size: 1.8rem; color: #0a2e5c; margin: 20px 0 10px; border-left: 6px solid #ffc107; padding-left: 14px; }
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-            gap: 30px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 16px;
         }
         .product-card {
             background: white;
             border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+            padding: 18px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
             transition: 0.3s;
             border: 1px solid #eef2f7;
             display: flex;
             flex-direction: column;
         }
-        .product-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
-        .product-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: contain;
-            background: #f8f9fa;
-            border-radius: 12px;
-        }
-        .product-card h3 { font-size: 1.1rem; color: #0a2e5c; margin: 12px 0 4px; }
-        .product-card .product-desc {
-            font-size: 0.85rem;
-            color: #555;
-            margin: 4px 0 8px;
-            line-height: 1.4;
-            min-height: 40px;
-        }
-        .product-card .category-tag { font-size: 0.75rem; color: #6c757d; background: #e9ecef; padding: 2px 12px; border-radius: 30px; display: inline-block; }
-        .product-card .price { font-size: 1.6rem; font-weight: 700; color: #e67e22; margin: 6px 0; }
-        .product-card .btn-add-cart {
-            background: #0a2e5c;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-            width: 100%;
-        }
+        .product-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); }
+        .product-card img { width: 100%; height: 180px; object-fit: contain; background: #f8f9fa; border-radius: 10px; }
+        .product-card h3 { font-size: 1rem; color: #0a2e5c; margin: 10px 0 4px; }
+        .product-card .product-desc { font-size: 0.8rem; color: #666; margin: 4px 0 8px; line-height: 1.4; min-height: 36px; }
+        .product-card .category-tag { font-size: 0.7rem; color: #6c757d; background: #e9ecef; padding: 2px 12px; border-radius: 30px; display: inline-block; }
+        .product-card .price { font-size: 1.4rem; font-weight: 700; color: #e67e22; margin: 6px 0; }
+        .product-card .btn-add-cart { background: #0a2e5c; color: white; border: none; padding: 10px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 8px; width: 100%; }
         .product-card .btn-add-cart:hover { background: #ffc107; color: #0a2e5c; }
 
         /* ----- CART SIDEBAR ----- */
         .cart-overlay {
-            position: fixed;
-            top: 0; right: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            display: none;
-            justify-content: flex-end;
+            position: fixed; top: 0; right: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            display: none; justify-content: flex-end;
         }
         .cart-sidebar {
-            background: white;
-            width: 420px;
-            max-width: 90%;
-            height: 100%;
-            padding: 30px;
-            overflow-y: auto;
-            box-shadow: -10px 0 40px rgba(0,0,0,0.2);
+            background: white; width: 380px; max-width: 90%; height: 100%;
+            padding: 25px; overflow-y: auto; box-shadow: -10px 0 40px rgba(0,0,0,0.2);
         }
         .cart-sidebar .close-cart { float: right; font-size: 1.8rem; cursor: pointer; color: #dc3545; }
         .cart-sidebar h2 { color: #0a2e5c; border-bottom: 3px solid #ffc107; padding-bottom: 12px; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .cart-item .item-info { flex: 1; }
-        .cart-item .item-info h4 { font-size: 1rem; }
-        .cart-item .qty-control { display: flex; gap: 10px; align-items: center; }
-        .cart-item .qty-control button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: 700; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .cart-item .qty-control { display: flex; gap: 8px; align-items: center; }
+        .cart-item .qty-control button { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: 700; }
         .cart-item .qty-control button:hover { background: #0a2e5c; color: white; }
-        .cart-total { font-size: 1.5rem; font-weight: 700; margin: 20px 0; color: #0a2e5c; }
-        .btn-checkout {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 14px;
-            width: 100%;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-        }
-        .btn-checkout:hover { background: #218838; }
+        .cart-total { font-size: 1.3rem; font-weight: 700; margin: 16px 0; color: #0a2e5c; }
+        .btn-checkout { background: #28a745; color: white; border: none; padding: 12px; width: 100%; border-radius: 30px; font-weight: 700; font-size: 1rem; cursor: pointer; }
 
-        /* ----- CHECKOUT MODAL ----- */
+        /* ----- CHECKOUT MODAL (Payment Options inside) ----- */
         .checkout-modal {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 3000;
-            display: none;
-            justify-content: center;
-            align-items: center;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 3000;
+            display: none; justify-content: center; align-items: center;
         }
         .checkout-form {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 500px;
-            width: 90%;
+            background: white; padding: 30px; border-radius: 20px; max-width: 500px; width: 90%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-height: 95vh; overflow-y: auto;
         }
-        .checkout-form h2 { color: #0a2e5c; margin-bottom: 20px; }
+        .checkout-form h2 { color: #0a2e5c; margin-bottom: 16px; }
         .checkout-form input, .checkout-form textarea {
-            width: 100%;
-            padding: 14px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
+            width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem;
+        }
+        .payment-options {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+        }
+        .payment-options label {
+            display: block;
+            padding: 10px 14px;
+            background: white;
             border-radius: 10px;
-            font-size: 1rem;
+            margin-bottom: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+        .payment-options label:hover { border-color: #ffc107; }
+        .payment-options input[type="radio"] { margin-right: 10px; accent-color: #0a2e5c; }
+        .upi-details {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 10px;
+            border: 1px dashed #ffc107;
+        }
+        .upi-details .upi-id { font-size: 1.2rem; font-weight: 700; color: #0a2e5c; }
+        .upi-details .btn-pay-upi {
+            display: inline-block;
+            background: #0a2e5c;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .upi-details .btn-pay-upi:hover { background: #ffc107; color: #0a2e5c; }
+        .upi-details .qr-placeholder {
+            margin: 10px auto;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 12px;
+            max-width: 150px;
+            font-size: 0.8rem;
+            color: #6c757d;
         }
         .checkout-form .btn-submit-order {
-            background: #ffc107;
-            color: #0a2e5c;
-            border: none;
-            padding: 14px;
-            width: 100%;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin-top: 10px;
+            background: #ffc107; color: #0a2e5c; border: none; padding: 12px; width: 100%;
+            border-radius: 30px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 10px;
         }
         .checkout-form .btn-submit-order:hover { background: #e6b800; }
+        #orderStatus { margin-top: 10px; font-weight: 600; }
 
         /* ----- ADMIN PANEL ----- */
         #adminPanel {
             display: none;
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 20px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-            margin: 30px 0;
+            margin: 20px 0;
             border: 2px solid #ffc107;
         }
         .admin-title { color: #0a2e5c; border-bottom: 3px solid #ffc107; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 16px 0; }
-        .form-row input { padding: 12px 16px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; }
-        .btn-add { background: #0a2e5c; color: white; padding: 14px 30px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 14px 0; }
+        .form-row input { padding: 10px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 0.95rem; }
+        .btn-add { background: #0a2e5c; color: white; padding: 12px 20px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; }
         .btn-add:hover { background: #1a4a7a; }
-        .admin-product-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 12px 18px; border-radius: 10px; margin-bottom: 8px; border-left: 4px solid #ffc107; flex-wrap: wrap; gap: 10px; }
-        .admin-product-item .info { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
-        .admin-product-item .info img { width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 6px; }
-        .btn-delete { background: #dc3545; color: white; border: none; padding: 6px 16px; border-radius: 30px; cursor: pointer; font-weight: 600; }
+        .admin-product-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 16px; border-radius: 10px; margin-bottom: 6px; border-left: 4px solid #ffc107; flex-wrap: wrap; gap: 8px; }
+        .admin-product-item .info { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .admin-product-item .info img { width: 36px; height: 36px; object-fit: contain; background: white; border-radius: 6px; }
+        .btn-delete { background: #dc3545; color: white; border: none; padding: 4px 14px; border-radius: 30px; cursor: pointer; font-weight: 600; font-size: 0.8rem; }
 
-        .about-section { background: white; padding: 50px 30px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); margin: 30px 0; }
-        .about-section h2 { color: #0a2e5c; border-left: 6px solid #ffc107; padding-left: 16px; }
-        .footer { text-align: center; padding: 30px; color: #6c757d; border-top: 1px solid #eef2f7; margin-top: 30px; }
+        .about-section { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.05); margin: 20px 0; }
+        .about-section h2 { color: #0a2e5c; border-left: 6px solid #ffc107; padding-left: 14px; }
+        .footer { text-align: center; padding: 20px; color: #6c757d; border-top: 1px solid #eef2f7; margin-top: 20px; font-size: 0.9rem; }
 
-        .loader { text-align: center; padding: 40px; font-size: 1.2rem; color: #0a2e5c; }
-        .no-products { text-align: center; padding: 60px; color: #6c757d; }
+        .loader { text-align: center; padding: 30px; font-size: 1.1rem; color: #0a2e5c; }
+        .no-products { text-align: center; padding: 40px; color: #6c757d; }
 
-        /* LOGIN MODAL */
         .login-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 4000;
             display: none; justify-content: center; align-items: center;
         }
-        .login-box { background: white; padding: 40px; border-radius: 20px; max-width: 400px; width: 90%; }
+        .login-box { background: white; padding: 30px; border-radius: 20px; max-width: 380px; width: 90%; }
         .login-box h2 { color: #0a2e5c; }
-        .login-box input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; }
-        .login-box button { width: 100%; padding: 14px; background: #0a2e5c; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
-        .login-box .error { color: #dc3545; margin-top: 10px; }
+        .login-box input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; }
+        .login-box button { width: 100%; padding: 12px; background: #0a2e5c; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .login-box .error { color: #dc3545; margin-top: 8px; font-size: 0.9rem; }
 
-        @media (max-width: 768px) {
-            .navbar { flex-direction: column; gap: 10px; padding: 10px; }
-            .navbar .nav-links { justify-content: center; }
-            .hero h1 { font-size: 2.2rem; }
-            .cart-sidebar { width: 100%; }
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 1.8rem; }
+            .category-highlights { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .cat-card { padding: 12px; }
+            .cat-card i { font-size: 1.5rem; }
+            .cat-card h4 { font-size: 0.75rem; }
+            .products-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .product-card { padding: 12px; }
+            .product-card img { height: 130px; }
+            .product-card h3 { font-size: 0.85rem; }
+            .product-card .price { font-size: 1.1rem; }
+            .product-card .btn-add-cart { font-size: 0.75rem; padding: 8px; }
         }
     </style>
 </head>
@@ -301,6 +385,9 @@
 <!-- ==================== NAVBAR ==================== -->
 <nav class="navbar">
     <div class="logo">Vaayu <span>Sports</span></div>
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+    </button>
     <div class="nav-links" id="navLinks">
         <button class="active-cat" onclick="filterProducts('All')">🏏 All</button>
         <button onclick="filterProducts('Bat')">🏏 Bats</button>
@@ -320,11 +407,11 @@
 <section class="hero">
     <h1>Vaayu <span>Sports</span></h1>
     <p>🏆 Premium Cricket & Sports Equipment – Play Like a Champion!</p>
-    <p style="font-size:0.9rem; opacity:0.7;">Bats • Balls • Gloves • Pads • Helmets • Accessories</p>
+    <p style="font-size:0.85rem; opacity:0.7;">Bats • Balls • Gloves • Pads • Helmets • Accessories</p>
 </section>
 
 <!-- ==================== CATEGORY HIGHLIGHTS ==================== -->
-<div class="category-highlights" id="categoryHighlights">
+<div class="category-highlights">
     <div class="cat-card" onclick="filterProducts('Bat')"><i class="fas fa-baseball-bat-ball"></i><h4>Bats</h4></div>
     <div class="cat-card" onclick="filterProducts('Ball')"><i class="fas fa-circle"></i><h4>Balls</h4></div>
     <div class="cat-card" onclick="filterProducts('Gloves')"><i class="fas fa-hand-sparkles"></i><h4>Gloves</h4></div>
@@ -343,35 +430,45 @@
 <!-- ==================== ABOUT ==================== -->
 <div class="container">
     <div class="about-section">
-        <h2>📍 About Vaayu Sports</h2>
-        <p style="font-size:1.05rem; color:#444; margin-top:16px;">
-            <strong>Vaayu Sports</strong> is a premier sports equipment store based in India, specializing in high-quality 
-            <strong>cricket gear</strong> – from professional-grade bats and leather balls to premium protective gear. 
-            <br><br>
-            <i class="fas fa-store" style="color:#ffc107;"></i> <strong>Visit our store:</strong> Near City Center, Lucknow, U.P. 
-            <br>
-            <i class="fas fa-phone" style="color:#ffc107;"></i> <strong>Call us:</strong> +91 99999 88888
+        <h2>🏏 About Vaayu Sports</h2>
+        <p style="font-size:1rem; color:#444; margin-top:12px;">
+            <strong>Vaayu Sports</strong> is a premier sports equipment store based in Lucknow, India, specializing in high-quality 
+            <strong>cricket gear</strong> – from professional-grade bats and leather balls to premium protective gear.
         </p>
     </div>
 </div>
 
+<!-- ==================== SHOP DETAILS (Homepage - No Payment) ==================== -->
+<div class="shop-details">
+    <h2>📍 Shop Information</h2>
+    <div class="info-grid">
+        <div class="info-item"><i class="fas fa-user-tie"></i> <div><strong>Owner:</strong> Mr. Hariram Pandey</div></div>
+        <div class="info-item"><i class="fas fa-store"></i> <div><strong>Shop:</strong> Vaayu Sports</div></div>
+        <div class="info-item"><i class="fas fa-map-marker-alt"></i> <div><strong>Location:</strong> Shakti Vihar Phase 5 New Delhi 110059</div></div>
+        <div class="info-item"><i class="fas fa-clock"></i> <div><strong>Timings:</strong> Mon–Sat, 10 AM – 8 PM</div></div>
+        <div class="info-item"><i class="fas fa-phone"></i> <div><strong>Contact:</strong> +91 99999 88888</div></div>
+        <div class="info-item"><i class="fas fa-envelope"></i> <div><strong>Email:</strong> info@vaayusports.in</div></div>
+    </div>
+</div>
+
+
 <!-- ==================== ADMIN PANEL ==================== -->
 <div id="adminPanel" class="container">
     <div class="admin-title">
-        <span><i class="fas fa-tools"></i> Admin Dashboard – Manage Products</span>
-        <button class="btn-delete" onclick="logoutAdmin()" style="background:#dc3545; padding:6px 20px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <span><i class="fas fa-tools"></i> Admin Dashboard</span>
+        <button class="btn-delete" onclick="logoutAdmin()" style="background:#dc3545; padding:6px 18px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
     <h3>➕ Add New Product</h3>
     <div class="form-row">
         <input type="text" id="prodName" placeholder="Product Name" />
-        <input type="text" id="prodPrice" placeholder="Price (e.g. 4500)" />
+        <input type="text" id="prodPrice" placeholder="Price (₹)" />
         <input type="text" id="prodImage" placeholder="Image URL" />
-        <input type="text" id="prodCategory" placeholder="Category (Bat, Ball...)" />
+        <input type="text" id="prodCategory" placeholder="Category" />
         <input type="text" id="prodDesc" placeholder="Short Description" />
     </div>
     <button class="btn-add" onclick="addProduct()"><i class="fas fa-plus-circle"></i> Add Product</button>
-    <hr style="margin:30px 0;" />
-    <h3>📦 Manage Existing Products</h3>
+    <hr style="margin:20px 0;" />
+    <h3>📦 Manage Products</h3>
     <div id="adminProductList"></div>
     <div id="adminLoading" class="loader" style="display:none;">Loading...</div>
 </div>
@@ -383,29 +480,51 @@
         <h2><i class="fas fa-shopping-bag"></i> Your Cart</h2>
         <div id="cartItems"></div>
         <div class="cart-total" id="cartTotal">Total: ₹0</div>
-        <button class="btn-checkout" onclick="showCheckout()"><i class="fas fa-credit-card"></i> Place Order</button>
+        <button class="btn-checkout" onclick="showCheckout()"><i class="fas fa-credit-card"></i> Proceed to Checkout</button>
     </div>
 </div>
 
-<!-- ==================== CHECKOUT ==================== -->
+<!-- ==================== CHECKOUT MODAL (Payment Options inside) ==================== -->
 <div class="checkout-modal" id="checkoutModal">
     <div class="checkout-form">
         <span style="float:right; font-size:1.8rem; cursor:pointer; color:#dc3545;" onclick="closeCheckout()">&times;</span>
         <h2>📋 Confirm Order</h2>
-        <input type="text" id="custName" placeholder="Full Name" />
-        <input type="text" id="custPhone" placeholder="Phone Number" />
-        <textarea id="custAddress" rows="3" placeholder="Delivery Address"></textarea>
-        <input type="text" id="custNotes" placeholder="Additional Notes" />
+        <input type="text" id="custName" placeholder="Full Name" required />
+        <input type="text" id="custPhone" placeholder="Phone Number" required />
+        <textarea id="custAddress" rows="3" placeholder="Delivery Address" required></textarea>
+        
+        <!-- PAYMENT OPTIONS -->
+        <div class="payment-options">
+            <h4 style="margin-bottom:10px; color:#0a2e5c;">💳 Select Payment Method</h4>
+            <label><input type="radio" name="paymentMethod" value="cod" checked onchange="toggleUpiSection(false)"> <i class="fas fa-money-bill-wave"></i> Cash on Delivery (COD)</label>
+            <label><input type="radio" name="paymentMethod" value="upi" onchange="toggleUpiSection(true)"> <i class="fas fa-qrcode"></i> UPI / QR (Instant Pay)</label>
+            
+            <div id="upiSection" style="display:none;">
+                <div class="upi-details">
+                    <p>📱 <span class="upi-id">vaayu@upi</span></p>
+                    <div class="qr-placeholder">
+                        <i class="fas fa-qrcode" style="font-size:2.5rem;color:#0a2e5c;"></i>
+                        <br><small>(अपना UPI QR Code यहाँ डालें)</small>
+                    </div>
+                    <a href="upi://pay?pa=vaayu@upi&pn=Vaayu%20Sports&cu=INR" target="_blank" class="btn-pay-upi" onclick="alert('Your UPI app will open to complete the payment.')">
+                        <i class="fas fa-bolt"></i> Pay via UPI
+                    </a>
+                    <p style="font-size:0.8rem; color:#6c757d; margin-top:6px;"></p>
+                </div>
+            </div>
+        </div>
+
         <button class="btn-submit-order" onclick="placeOrder()"><i class="fas fa-check-circle"></i> Confirm Order</button>
-        <div id="orderStatus" style="margin-top:12px; color:#28a745; font-weight:600;"></div>
+        <div id="orderStatus"></div>
     </div>
 </div>
 
-<!-- ==================== LOGIN ==================== -->
+<!-- ==================== LOGIN MODAL ==================== -->
 <div class="login-modal" id="loginModal">
     <div class="login-box">
         <span style="float:right; font-size:1.8rem; cursor:pointer; color:#dc3545;" onclick="closeLoginModal()">&times;</span>
         <h2>🔐 Admin Login</h2>
+        <p style="color:#6c757d; font-size:0.9rem;">Vaayu Sports Management</p>
         <input type="email" id="loginEmail" placeholder="Email" />
         <input type="password" id="loginPassword" placeholder="Password" />
         <button onclick="loginAdmin()">Login</button>
@@ -423,9 +542,9 @@
 <!-- ==================== JAVASCRIPT ==================== -->
 <script>
     // ============================================================
-    // 🔥 अपनी Firebase Config यहाँ पेस्ट करें
+    // 🔥 FIREBASE CONFIG (आपका अपना Config पहले से मौजूद है - ✅ सही है)
     // ============================================================
-     const firebaseConfig = {
+    const firebaseConfig = {
         apiKey: "AIzaSyDl1fiFglKLK4d5mRgNt-35umLBvph3nhk",
         authDomain: "vaayu-sports.firebaseapp.com",
         projectId: "vaayu-sports",
@@ -433,28 +552,45 @@
         messagingSenderId: "783300529761",
         appId: "1:783300529761:web:0d2fa0af8b7d5778d2a420"
     };
-
-    // Initialize Firebase (Compat SDK तरीका - बिना "import" के)
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    // ---------- GLOBALS ----------
-    let currentUser = null;
-    let cart = [];
-    let currentFilter = 'All';
-    let allProducts = [];
+    // ============================================================
+    // 📧 EMAILJS CONFIG (Order Notification के लिए)
+    //    ⚠️ इसे सेट करना है - नीचे Instructions पढ़ें!
+    // ============================================================
+    (function() {
+        // 🔑 Step 1: अपना EmailJS Public Key यहाँ डालें
+        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
+    })();
 
-    // ---------- DOM REFS ----------
-    const productsContainer = document.getElementById('productsContainer');
-    const shopLoading = document.getElementById('shopLoading');
-    const categoryTitle = document.getElementById('categoryTitle');
-    const cartItemsDiv = document.getElementById('cartItems');
-    const cartTotalDiv = document.getElementById('cartTotal');
-    const cartCountSpan = document.getElementById('cartCount');
-    const adminProductList = document.getElementById('adminProductList');
+    // ============================================================
+    // 📱 MOBILE TOGGLE
+    // ============================================================
+    window.toggleMobileMenu = function() {
+        document.getElementById('navLinks').classList.toggle('open');
+        document.getElementById('hamburgerBtn').classList.toggle('active');
+    };
+    document.querySelectorAll('.nav-links button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (window.innerWidth <= 992) {
+                document.getElementById('navLinks').classList.remove('open');
+                document.getElementById('hamburgerBtn').classList.remove('active');
+            }
+        });
+    });
 
-    // ---------- AUTH ----------
+    // ============================================================
+    // 💳 PAYMENT TOGGLE (COD / UPI)
+    // ============================================================
+    window.toggleUpiSection = function(show) {
+        document.getElementById('upiSection').style.display = show ? 'block' : 'none';
+    };
+
+    // ============================================================
+    // 🔐 ADMIN LOGIN / LOGOUT
+    // ============================================================
     window.showLoginModal = function() {
         document.getElementById('loginModal').style.display = 'flex';
         document.getElementById('loginError').innerText = '';
@@ -484,12 +620,18 @@
             alert('Logged out.');
         });
     };
+    let currentUser = null;
     auth.onAuthStateChanged((user) => {
         if (user) { currentUser = user; document.getElementById('adminPanel').style.display = 'block'; loadAdminProducts(); }
         else { currentUser = null; document.getElementById('adminPanel').style.display = 'none'; }
     });
 
-    // ---------- FILTER ----------
+    // ============================================================
+    // 📦 PRODUCT LOGIC
+    // ============================================================
+    let allProducts = [];
+    let currentFilter = 'All';
+
     window.filterProducts = function(category) {
         currentFilter = category;
         document.querySelectorAll('.nav-links button').forEach(btn => btn.classList.remove('active-cat'));
@@ -498,63 +640,60 @@
                 btn.classList.add('active-cat');
             }
         });
-        categoryTitle.innerText = category === 'All' ? '🔥 All Products' : `🏏 ${category}s`;
+        document.getElementById('categoryTitle').innerText = category === 'All' ? '🔥 All Products' : `🏏 ${category}s`;
         renderProducts(allProducts);
         document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
     };
 
-    // ---------- RENDER ----------
     function renderProducts(products) {
         const filtered = currentFilter === 'All' ? products : products.filter(p => p.category === currentFilter);
-        productsContainer.innerHTML = '';
-        if (filtered.length === 0) {
-            productsContainer.innerHTML = '<div class="no-products">🛒 No products in this category.</div>';
-            return;
-        }
+        const container = document.getElementById('productsContainer');
+        container.innerHTML = '';
+        if (filtered.length === 0) { container.innerHTML = '<div class="no-products">🛒 No products.</div>'; return; }
         filtered.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <img src="${p.image || 'https://via.placeholder.com/200'}" alt="${p.name}" />
-                <h3>${p.name}</h3>
-                <p class="product-desc">${p.description || 'Premium cricket gear from Vaayu Sports.'}</p>
-                <span class="category-tag">${p.category}</span>
-                <div class="price">₹${p.price}</div>
-                <button class="btn-add-cart" onclick="addToCart('${p.id}')"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+            container.innerHTML += `
+                <div class="product-card">
+                    <img src="${p.image || 'https://picsum.photos/seed/default/300/300'}" alt="${p.name}" />
+                    <h3>${p.name}</h3>
+                    <p class="product-desc">${p.description || 'Premium gear.'}</p>
+                    <span class="category-tag">${p.category}</span>
+                    <div class="price">₹${p.price}</div>
+                    <button class="btn-add-cart" onclick="addToCart('${p.id}')"><i class="fas fa-cart-plus"></i> Add to Cart</button>
+                </div>
             `;
-            productsContainer.appendChild(card);
         });
     }
 
-    // ---------- LOAD ----------
     function loadPublicProducts() {
-        shopLoading.style.display = 'block';
+        const loading = document.getElementById('shopLoading');
+        loading.style.display = 'block';
         db.collection('vaayu_products').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
-            shopLoading.style.display = 'none';
+            loading.style.display = 'none';
             allProducts = [];
             snapshot.forEach(doc => { allProducts.push({ id: doc.id, ...doc.data() }); });
             renderProducts(allProducts);
         }, (error) => {
-            shopLoading.style.display = 'none';
-            productsContainer.innerHTML = '<p style="color:red;">Error loading: ' + error.message + '</p>';
+            loading.style.display = 'none';
+            document.getElementById('productsContainer').innerHTML = '<p style="color:red;">Error: ' + error.message + '</p>';
         });
     }
 
-    // ---------- ADMIN LOAD ----------
+    // ---------- ADMIN CRUD ----------
     function loadAdminProducts() {
         if (!currentUser) return;
         const loading = document.getElementById('adminLoading');
         loading.style.display = 'block';
         db.collection('vaayu_products').orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
             loading.style.display = 'none';
-            adminProductList.innerHTML = '';
-            if (snapshot.empty) { adminProductList.innerHTML = '<p style="color:#6c757d;">No products.</p>'; return; }
+            const container = document.getElementById('adminProductList');
+            container.innerHTML = '';
+            if (snapshot.empty) { container.innerHTML = '<p style="color:#6c757d;">No products.</p>'; return; }
             snapshot.forEach(doc => {
                 const d = doc.data();
-                adminProductList.innerHTML += `
+                container.innerHTML += `
                     <div class="admin-product-item">
                         <div class="info">
-                            <img src="${d.image || 'https://via.placeholder.com/40'}" />
+                            <img src="${d.image || 'https://picsum.photos/seed/default/40/40'}" />
                             <div><strong>${d.name}</strong> (₹${d.price}) <span style="color:#6c757d;font-size:0.8rem;">${d.category}</span></div>
                         </div>
                         <button class="btn-delete" onclick="deleteProduct('${doc.id}')"><i class="fas fa-trash"></i> Delete</button>
@@ -564,15 +703,14 @@
         });
     }
 
-    // ---------- ADMIN ADD ----------
     window.addProduct = function() {
-        if (!currentUser) { alert('Please login as Admin.'); return; }
+        if (!currentUser) { alert('Login as Admin.'); return; }
         const name = document.getElementById('prodName').value.trim();
         const price = document.getElementById('prodPrice').value.trim();
-        const image = document.getElementById('prodImage').value.trim();
+        const image = document.getElementById('prodImage').value.trim() || 'https://picsum.photos/seed/default/300/300';
         const category = document.getElementById('prodCategory').value.trim();
-        const description = document.getElementById('prodDesc').value.trim() || 'Premium product from Vaayu Sports.';
-        if (!name || !price || !image || !category) { alert('All fields required!'); return; }
+        const description = document.getElementById('prodDesc').value.trim() || 'Premium product.';
+        if (!name || !price || !category) { alert('Name, Price, Category required!'); return; }
         if (isNaN(price)) { alert('Price must be a number.'); return; }
         db.collection('vaayu_products').add({
             name, price: parseFloat(price), image, category, description,
@@ -580,42 +718,37 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
             alert('✅ Product Added!');
-            document.getElementById('prodName').value = '';
-            document.getElementById('prodPrice').value = '';
-            document.getElementById('prodImage').value = '';
-            document.getElementById('prodCategory').value = '';
-            document.getElementById('prodDesc').value = '';
+            ['prodName','prodPrice','prodImage','prodCategory','prodDesc'].forEach(id => document.getElementById(id).value = '');
         }).catch(err => alert('Error: ' + err.message));
     };
 
-    // ---------- ADMIN DELETE ----------
     window.deleteProduct = function(id) {
         if (!currentUser) return;
         if (!confirm('Delete this product?')) return;
-        db.collection('vaayu_products').doc(id).delete()
-            .then(() => alert('Deleted.'))
-            .catch(err => alert('Error: ' + err.message));
+        db.collection('vaayu_products').doc(id).delete().then(() => alert('Deleted.')).catch(err => alert('Error: ' + err.message));
     };
 
     // ---------- CART ----------
+    let cart = [];
     window.addToCart = function(productId) {
         const product = allProducts.find(p => p.id === productId);
         if (!product) return;
         const existing = cart.find(item => item.id === productId);
-        if (existing) { existing.qty += 1; }
-        else { cart.push({ ...product, qty: 1 }); }
+        if (existing) existing.qty += 1;
+        else cart.push({ ...product, qty: 1 });
         updateCartUI();
         toggleCart();
     };
     function updateCartUI() {
-        cartItemsDiv.innerHTML = '';
-        if (cart.length === 0) { cartItemsDiv.innerHTML = '<p style="color:#6c757d;">Cart is empty.</p>'; }
+        const container = document.getElementById('cartItems');
+        container.innerHTML = '';
+        if (cart.length === 0) { container.innerHTML = '<p style="color:#6c757d;">Cart is empty.</p>'; }
         let total = 0;
         cart.forEach(item => {
             total += item.price * item.qty;
-            cartItemsDiv.innerHTML += `
+            container.innerHTML += `
                 <div class="cart-item">
-                    <div class="item-info"><h4>${item.name}</h4><small>₹${item.price}</small></div>
+                    <div><h4>${item.name}</h4><small>₹${item.price}</small></div>
                     <div class="qty-control">
                         <button onclick="changeQty('${item.id}', -1)">-</button>
                         <span>${item.qty}</span>
@@ -625,15 +758,15 @@
                 </div>
             `;
         });
-        cartTotalDiv.innerText = `Total: ₹${total}`;
+        document.getElementById('cartTotal').innerText = `Total: ₹${total}`;
         const count = cart.reduce((acc, i) => acc + i.qty, 0);
-        cartCountSpan.innerText = count;
+        document.getElementById('cartCount').innerText = count;
     }
     window.changeQty = function(id, delta) {
         const item = cart.find(i => i.id === id);
         if (!item) return;
         item.qty += delta;
-        if (item.qty <= 0) { cart = cart.filter(i => i.id !== id); }
+        if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
         updateCartUI();
     };
     window.toggleCart = function() {
@@ -644,38 +777,72 @@
         if (e.target === e.currentTarget) toggleCart();
     };
 
-    // ---------- CHECKOUT ----------
+    // ---------- CHECKOUT / PLACE ORDER (With EmailJS) ----------
     window.showCheckout = function() {
         if (cart.length === 0) { alert('Cart is empty!'); return; }
         document.getElementById('checkoutModal').style.display = 'flex';
         document.getElementById('orderStatus').innerHTML = '';
+        document.querySelector('input[name="paymentMethod"][value="cod"]').checked = true;
+        document.getElementById('upiSection').style.display = 'none';
     };
     window.closeCheckout = function() {
         document.getElementById('checkoutModal').style.display = 'none';
     };
+
     window.placeOrder = function() {
         const name = document.getElementById('custName').value.trim();
         const phone = document.getElementById('custPhone').value.trim();
         const address = document.getElementById('custAddress').value.trim();
         if (!name || !phone || !address) { alert('Please fill Name, Phone, and Address.'); return; }
+
+        const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
         const total = cart.reduce((acc, i) => acc + (i.price * i.qty), 0);
-        db.collection('vaayu_orders').add({
-            customer: { name, phone, address, notes: document.getElementById('custNotes').value.trim() },
-            items: cart.map(i => ({ name: i.name, price: i.price, qty: i.qty, category: i.category })),
+        const itemsList = cart.map(i => `${i.name} (₹${i.price} x ${i.qty})`).join(', ');
+        const orderData = {
+            customer: { name, phone, address, notes: document.getElementById('custNotes')?.value || '' },
+            items: cart.map(i => ({ name: i.name, price: i.price, qty: i.qty })),
             total: total,
+            paymentMethod: paymentMethod,
             status: 'Pending',
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-            document.getElementById('orderStatus').innerHTML = '✅ Order Placed Successfully! We will call you.';
-            cart = [];
-            updateCartUI();
-            setTimeout(() => { closeCheckout(); toggleCart(); }, 2000);
-        }).catch(err => alert('Order failed: ' + err.message));
+        };
+
+        db.collection('vaayu_orders').add(orderData)
+            .then((docRef) => {
+                document.getElementById('orderStatus').innerHTML = '✅ Order Placed! Notification sent to owner.';
+                
+                const emailParams = {
+                    to_email: 'suryadevpandey29@gmail.com',
+                    to_name: 'Vaayu Sports Owner',
+                    customer_name: name,
+                    customer_phone: phone,
+                    customer_address: address,
+                    order_id: docRef.id,
+                    items: itemsList,
+                    total_amount: total,
+                    payment_method: paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 'UPI / QR (Paid)'
+                };
+
+                // ⚠️ Step 2 & 3: अपना Service ID और Template ID नीचे डालें
+                emailjs.send('YOUR_EMAILJS_SERVICE_ID', 'YOUR_EMAILJS_TEMPLATE_ID', emailParams)
+                    .then(() => console.log('📧 Email sent!'))
+                    .catch((err) => console.error('❌ Email send failed:', err));
+
+                cart = [];
+                updateCartUI();
+                setTimeout(() => { closeCheckout(); toggleCart(); }, 2500);
+            })
+            .catch(err => {
+                alert('Order failed: ' + err.message);
+                document.getElementById('orderStatus').innerHTML = '❌ ' + err.message;
+            });
     };
 
-    // ---------- INIT ----------
+    // ============================================================
+    // 🚀 INIT
+    // ============================================================
     loadPublicProducts();
-    if (auth.currentUser) { loadAdminProducts(); }
+    if (auth.currentUser) loadAdminProducts();
     console.log('🏏 Vaayu Sports Loaded!');
 </script>
 </body>
